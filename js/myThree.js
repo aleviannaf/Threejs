@@ -10,20 +10,29 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
+const light = new THREE.AmbientLight( 0xFFFFFF ); // soft white light
+scene.add( light );
 
 const controls = new THREE.OrbitControls( camera, renderer.domElement );
 
-const geometry = new THREE.BoxGeometry(1, 1, 1);
-const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
-const cube = new THREE.Mesh(geometry, material);
-scene.add(cube);
+var mtlLoader = new THREE.MTLLoader();
+mtlLoader.setPath("../assets/");
+mtlLoader.load("r2-d2.mtl", function(material){
+  material.preload();
+  var objLoader = new THREE.OBJLoader();
+  objLoader.setMaterials(material);
+  objLoader.setPath("../assets/");
+  objLoader.load("r2-d2.obj", function(object){
+    scene.add(object);
+    object.position.y -=60;
+  })
+})
 
 camera.position.z = 5;
 
 function animate() {
   requestAnimationFrame(animate);
-  cube.rotation.x += 0.01;
-  cube.rotation.y += 0.01;
+ 
   renderer.render(scene, camera);
 }
 animate();
